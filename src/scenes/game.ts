@@ -13,6 +13,7 @@ class GameScene extends Phaser.Scene {
   player!: Player;
   boxGroup!: Phaser.Physics.Arcade.StaticGroup;
   activeBox: Box | undefined;
+  selectedBoxes: Box[] = [];
 
   constructor() {
     super("game");
@@ -30,6 +31,18 @@ class GameScene extends Phaser.Scene {
       this.handlePlayerBoxCollider
     );
   }
+  checkMatch() {
+    const [first, second] = this.selectedBoxes;
+    const matches = first.imageKey === second.imageKey;
+    if (matches) {
+      first.setIsMatched(true);
+      second.setIsMatched(true);
+    } else {
+      first.close(() => {});
+      second.close(() => {});
+    }
+    this.selectedBoxes = [];
+  }
   handlePlayerBoxCollider: ArcadePhysicsCallback = (_player, _box) => {
     const box = _box as Box;
     if (this.activeBox || box.isActive) return;
@@ -39,9 +52,18 @@ class GameScene extends Phaser.Scene {
   update() {
     this.sortDepth();
     this.player.update(this.cursors, this.handlePlayerMove.bind(this));
+
+    if (this.selectedBoxes.length === 2) return;
+
     const SpaceJustPressed = Phaser.Input.Keyboard.JustUp(this.cursors.space);
     if (SpaceJustPressed && this.activeBox) {
-      this.activeBox.open();
+      const _box = this.activeBox;
+      _box.open(() => {
+        this.selectedBoxes.push(_box);
+        if (this.selectedBoxes.length === 2) {
+          this.checkMatch();
+        }
+      });
     }
   }
   setActiveBox(box?: typeof this.activeBox) {
@@ -55,7 +77,7 @@ class GameScene extends Phaser.Scene {
         this.activeBox.x,
         this.activeBox.y
       );
-      if (playerDistanceFromBox > 60 && !this.activeBox.isSelected) {
+      if (playerDistanceFromBox > 60 && !this.activeBox.isMatched) {
         this.activeBox.setIsActive(false);
         this.setActiveBox(undefined);
       }
