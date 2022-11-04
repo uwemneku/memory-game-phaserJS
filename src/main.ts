@@ -2,8 +2,8 @@ import Phaser from "phaser";
 import GameScene from "./scenes/game";
 import Preloader from "./scenes/preloader";
 
-const width = 1080;
-const height = width * 1.7777778;
+const width = 600;
+const height = width;
 
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
