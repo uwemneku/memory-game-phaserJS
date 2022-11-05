@@ -37,15 +37,18 @@ class GameScene extends Phaser.Scene {
     if (matches) {
       first.setIsMatched(true);
       second.setIsMatched(true);
+      this.selectedBoxes = [];
     } else {
-      first.close(() => {});
-      second.close(() => {});
+      this.selectedBoxes.map((i) => {
+        i.close(() => {
+          this.selectedBoxes = [];
+        });
+      });
     }
-    this.selectedBoxes = [];
   }
   handlePlayerBoxCollider: ArcadePhysicsCallback = (_player, _box) => {
     const box = _box as Box;
-    if (this.activeBox || box.isActive) return;
+    if (this.activeBox || box.isActive || box.isMatched) return;
     box.setIsActive(true);
     this.setActiveBox(box);
   };
@@ -53,13 +56,12 @@ class GameScene extends Phaser.Scene {
     this.sortDepth();
     this.player.update(this.cursors, this.handlePlayerMove.bind(this));
 
-    if (this.selectedBoxes.length === 2) return;
-
     const SpaceJustPressed = Phaser.Input.Keyboard.JustUp(this.cursors.space);
     if (SpaceJustPressed && this.activeBox) {
       const _box = this.activeBox;
+      if (this.selectedBoxes.length === 2) return;
+      this.selectedBoxes.push(_box);
       _box.open(() => {
-        this.selectedBoxes.push(_box);
         if (this.selectedBoxes.length === 2) {
           this.checkMatch();
         }
@@ -93,7 +95,7 @@ class GameScene extends Phaser.Scene {
           150 * (col + 1),
           index
         );
-        this.boxGroup.add(a);
+        this.boxGroup.add(a); // this is called first to the the box a ```setSize``` property
         a.body.setSize(64, 32);
       });
     });

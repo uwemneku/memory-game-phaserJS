@@ -20,19 +20,19 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   }
 
   setIsActive(state: boolean) {
+    if (this.isMatched) return;
     this.isActive = state;
     const frame = state ? 9 : 10;
     this.setFrame(frame);
   }
   setIsMatched(state: boolean) {
-    this.isActive = state;
+    this.isMatched = state;
     this.setFrame(8);
   }
-  setIsOpen(state: boolean) {
-    this.isOpen = state;
-  }
+
   open(callBack: () => void) {
     if (this.isOpen) return;
+    this.isOpen = true;
     this.tweens.add({
       targets: this.boxImage,
       y: "-=50",
@@ -40,7 +40,6 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
       scale: 1,
       duration: 250,
       onComplete: () => {
-        this.isOpen = true;
         callBack();
       },
     });
@@ -48,10 +47,11 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   close(callBack: () => void) {
     this.tweens.add({
       targets: this.boxImage,
-      y: "+=0",
+      y: this.y,
       alpha: 0,
       scale: 0,
       duration: 250,
+      delay: 2000,
       onComplete: () => {
         this.isOpen = false;
         callBack();
