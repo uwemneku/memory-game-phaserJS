@@ -3,6 +3,7 @@ import { SceneKeys, SoundKeys } from "./../constants/assets";
 import Phaser from "phaser";
 import Box from "./box";
 import Player from "./player";
+import Modal from "./Modal";
 
 const level = [
   [1, 0, 3],
@@ -17,7 +18,9 @@ class GameScene extends Phaser.Scene {
   activeBox: Box | undefined;
   selectedBoxes: Box[] = [];
   music!: Phaser.Sound.BaseSound;
+  modal!: Modal;
   matchCount = 0;
+  startKey!: Phaser.Input.Keyboard.Key;
 
   constructor() {
     super(SceneKeys.game);
@@ -25,14 +28,16 @@ class GameScene extends Phaser.Scene {
   }
   init() {
     this.cursors = this.input.keyboard.createCursorKeys();
-    const l = this.sound.add(SoundKeys.Music, { loop: true, volume: 0 });
-    l.play();
-    tweenMusic(this, l, 0.5);
+    this.music = this.sound.add(SoundKeys.Music, { loop: true, volume: 0 });
+    this.startKey = this.input.keyboard.addKey("A");
+    this.music.play();
+    tweenMusic(this, this.music, 0.5);
   }
 
   create() {
     this.boxGroup = this.physics.add.staticGroup();
     this.player = new Player(this.physics.add, this.scale);
+    this.player.enable();
     this.createBoxes();
     this.physics.add.collider(
       this.player.getPlayer(),
@@ -61,6 +66,7 @@ class GameScene extends Phaser.Scene {
   }
   handleGameWon() {
     if (this.matchCount === 4) {
+      tweenMusic(this, this.music, 0);
       this.sound.play(SoundKeys.Victory);
       this.addText("You Won");
     }
@@ -80,7 +86,6 @@ class GameScene extends Phaser.Scene {
       const _box = this.activeBox;
       if (this.selectedBoxes.length === 2) return;
       this.selectedBoxes.push(_box);
-      this.sound.play(SoundKeys.Pick);
       _box.open(() => {
         if (this.selectedBoxes.length === 2) {
           this.checkMatch();
@@ -109,21 +114,21 @@ class GameScene extends Phaser.Scene {
     const { width } = this.scale;
     level.forEach((arr, row) => {
       arr.forEach((index, col) => {
-        const a = new Box(
+        const _box = new Box(
           this,
           width * 0.25 * (row + 1),
           150 * (col + 1),
           index
         );
-        this.boxGroup.add(a); // this is called first to give the box a ```setSize``` property
-        a.body.setSize(64, 32);
+        this.boxGroup.add(_box); // this is called first to give the box a ```setSize``` property
+        _box.body.setSize(64, 32);
       });
     });
   }
   sortDepth() {
     this.children.each((_child) => {
       const child = _child as Phaser.Physics.Arcade.Sprite;
-      const skipDepthSort = !["Graphics", "Image"].includes(child.type);
+      const skipDepthSort = !["Graphics", "Image", "Text"].includes(child.type);
       if (skipDepthSort) {
         child.setDepth(child.y);
       }
@@ -133,7 +138,8 @@ class GameScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.add
       .text(width / 2, height / 2, text, { fontSize: "40px" })
-      .setOrigin(0.5);
+      .setOrigin(0.5)
+      .setDepth(10000);
   }
 }
 

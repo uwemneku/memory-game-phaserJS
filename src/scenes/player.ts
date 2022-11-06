@@ -11,6 +11,7 @@ import { sokoban } from "../constants/assets";
 type Direction = "left" | "right" | "up" | "down";
 export default class Player {
   player: Phaser.Physics.Arcade.Sprite;
+  isEnabled: boolean = false;
   constructor(
     add: Phaser.Physics.Arcade.Factory,
     scale: Phaser.Scale.ScaleManager
@@ -30,6 +31,7 @@ export default class Player {
     cursors: Phaser.Types.Input.Keyboard.CursorKeys,
     onMove: (x: number, y: number) => void
   ) {
+    if (!this.isEnabled) return;
     // movement animation
     const { down, left, right, up } = cursors;
     const animationDirection: Direction | undefined = down.isDown
@@ -64,5 +66,11 @@ export default class Player {
           };
     this.player.play(currentAnimation.key, true);
     this.player.setVelocity(...currentAnimation.velocity);
+  }
+  enable() {
+    this.isEnabled = true;
+  }
+  disable() {
+    this.isEnabled = false;
   }
 }

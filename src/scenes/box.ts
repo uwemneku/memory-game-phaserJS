@@ -1,4 +1,4 @@
-import { imageKeys, sokoban } from "../constants/assets";
+import { imageKeys, sokoban, SoundKeys } from "../constants/assets";
 
 export default class Box extends Phaser.Physics.Arcade.Sprite {
   isMatched = false;
@@ -7,16 +7,22 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   boxImage: Phaser.GameObjects.Image;
   tweens: Phaser.Tweens.TweenManager;
   imageKey: string;
+  scene: Phaser.Scene;
   constructor(scene: Phaser.Scene, x: number, y: number, imageIndex: number) {
     super(scene, x, y, sokoban, 10);
+    this.scene = scene;
     this.imageKey = imageKeys[imageIndex];
     this.boxImage = scene.add
       .image(x, y, this.imageKey)
       .setDepth(2000)
       .setScale(0)
       .setAlpha(0);
+
     this.tweens = scene.tweens;
     scene.add.existing(this);
+    this.setInteractive().on("pointerdown", () => {
+      this.open(() => {});
+    });
   }
 
   setIsActive(state: boolean) {
@@ -33,6 +39,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   open(callBack: () => void) {
     if (this.isOpen) return;
     this.isOpen = true;
+    this.scene.sound.play(SoundKeys.Pick);
     this.tweens.add({
       targets: this.boxImage,
       y: "-=50",
