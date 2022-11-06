@@ -7,7 +7,6 @@ import {
   UP_WALK,
 } from "../constants/animation";
 import { sokoban } from "../constants/assets";
-import Box from "./box";
 
 type Direction = "left" | "right" | "up" | "down";
 export default class Player {

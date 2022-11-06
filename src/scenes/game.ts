@@ -1,3 +1,5 @@
+import { tweenMusic } from "./MusicUtils";
+import { SceneKeys, SoundKeys } from "./../constants/assets";
 import Phaser from "phaser";
 import Box from "./box";
 import Player from "./player";
@@ -14,15 +16,22 @@ class GameScene extends Phaser.Scene {
   boxGroup!: Phaser.Physics.Arcade.StaticGroup;
   activeBox: Box | undefined;
   selectedBoxes: Box[] = [];
+  music!: Phaser.Sound.BaseSound;
+  matchCount = 0;
 
   constructor() {
-    super("game");
+    super(SceneKeys.game);
     this.activeBox = undefined;
+  }
+  init() {
+    this.cursors = this.input.keyboard.createCursorKeys();
+    const l = this.sound.add(SoundKeys.Music, { loop: true, volume: 0 });
+    l.play();
+    tweenMusic(this, l, 0.5);
   }
 
   create() {
     this.boxGroup = this.physics.add.staticGroup();
-    this.cursors = this.input.keyboard.createCursorKeys();
     this.player = new Player(this.physics.add, this.scale);
     this.createBoxes();
     this.physics.add.collider(
@@ -37,13 +46,23 @@ class GameScene extends Phaser.Scene {
     if (matches) {
       first.setIsMatched(true);
       second.setIsMatched(true);
+      this.sound.play(SoundKeys.Match);
+      this.matchCount++;
       this.selectedBoxes = [];
+      this.handleGameWon();
     } else {
+      this.sound.play(SoundKeys.GameOver);
       this.selectedBoxes.map((i) => {
         i.close(() => {
           this.selectedBoxes = [];
         });
       });
+    }
+  }
+  handleGameWon() {
+    if (this.matchCount === 4) {
+      this.sound.play(SoundKeys.Victory);
+      this.addText("You Won");
     }
   }
   handlePlayerBoxCollider: ArcadePhysicsCallback = (_player, _box) => {
@@ -61,6 +80,7 @@ class GameScene extends Phaser.Scene {
       const _box = this.activeBox;
       if (this.selectedBoxes.length === 2) return;
       this.selectedBoxes.push(_box);
+      this.sound.play(SoundKeys.Pick);
       _box.open(() => {
         if (this.selectedBoxes.length === 2) {
           this.checkMatch();
@@ -79,7 +99,7 @@ class GameScene extends Phaser.Scene {
         this.activeBox.x,
         this.activeBox.y
       );
-      if (playerDistanceFromBox > 60 && !this.activeBox.isMatched) {
+      if (playerDistanceFromBox > 60) {
         this.activeBox.setIsActive(false);
         this.setActiveBox(undefined);
       }
@@ -95,7 +115,7 @@ class GameScene extends Phaser.Scene {
           150 * (col + 1),
           index
         );
-        this.boxGroup.add(a); // this is called first to the the box a ```setSize``` property
+        this.boxGroup.add(a); // this is called first to give the box a ```setSize``` property
         a.body.setSize(64, 32);
       });
     });
@@ -108,6 +128,12 @@ class GameScene extends Phaser.Scene {
         child.setDepth(child.y);
       }
     });
+  }
+  addText(text: string) {
+    const { width, height } = this.scale;
+    this.add
+      .text(width / 2, height / 2, text, { fontSize: "40px" })
+      .setOrigin(0.5);
   }
 }
 

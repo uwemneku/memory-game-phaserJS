@@ -51,7 +51,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
       alpha: 0,
       scale: 0,
       duration: 250,
-      delay: 2000,
+      delay: 250,
       onComplete: () => {
         this.isOpen = false;
         callBack();
