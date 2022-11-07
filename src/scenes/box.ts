@@ -20,9 +20,6 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
 
     this.tweens = scene.tweens;
     scene.add.existing(this);
-    this.setInteractive().on("pointerdown", () => {
-      this.open(() => {});
-    });
   }
 
   setIsActive(state: boolean) {
@@ -39,6 +36,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
   open(callBack: () => void) {
     if (this.isOpen) return;
     this.isOpen = true;
+    this.setIsActive(true);
     this.scene.sound.play(SoundKeys.Pick);
     this.tweens.add({
       targets: this.boxImage,
@@ -52,6 +50,7 @@ export default class Box extends Phaser.Physics.Arcade.Sprite {
     });
   }
   close(callBack: () => void) {
+    this.setIsActive(false);
     this.tweens.add({
       targets: this.boxImage,
       y: this.y,

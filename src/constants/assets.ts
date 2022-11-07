@@ -9,6 +9,7 @@ enum Assets {
 export enum SceneKeys {
   preloader = "preloader",
   game = "game",
+  loading = "loading",
 }
 
 export enum SoundKeys {

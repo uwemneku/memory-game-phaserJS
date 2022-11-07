@@ -8,32 +8,31 @@ export default class CountdownController {
     this.label = label;
     this.duration = 0;
   }
-  start(callback?: () => void, duration = 10000) {
+  start(duration = 45000, callback: () => void) {
     this.stop();
     this.duration = duration;
     this.timerEvent = this.scene.time.addEvent({
       delay: duration,
-
-      callback: () => {
-        this.label.text = "0";
-        this.stop();
-        if (callback) callback();
-      },
+      callbackScope: this.scene,
+      callback,
     });
+
+    return this;
   }
   stop() {
     if (this.timerEvent) {
       this.timerEvent.destroy();
       this.timerEvent = undefined;
     }
+    return this;
+  }
+  restart() {
+    return this;
   }
   update() {
-    if (!this.timerEvent || this.duration <= 0) return;
-    const elapsedTime = this.timerEvent?.getElapsed();
-    const remaining = this.duration - elapsedTime;
-    const seconds = remaining / 1000;
-    this.label.text = seconds.toFixed(3);
-    if (seconds) {
-    }
+    const elapsed = this.timerEvent?.getElapsed() || 0;
+    const remaining = this.duration - elapsed;
+    const text = (remaining / 1000).toFixed(2);
+    this.label.setText(text);
   }
 }

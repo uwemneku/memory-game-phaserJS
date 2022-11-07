@@ -1,6 +1,8 @@
 import Phaser from "phaser";
 import GameScene from "./scenes/game";
+import Loading from "./scenes/Loading";
 import Preloader from "./scenes/preloader";
+import UIPlugin from "phaser3-rex-plugins/templates/ui/ui-plugin";
 
 const width = 600;
 const height = width;
@@ -14,14 +16,22 @@ const config: Phaser.Types.Core.GameConfig = {
     default: "arcade",
     arcade: {
       gravity: { y: 0 },
-      debug: true,
     },
+  },
+  plugins: {
+    scene: [
+      {
+        key: "rexUI",
+        plugin: UIPlugin,
+        mapping: "rexUI",
+      },
+    ],
   },
   scale: {
     // mode: Phaser.Scale.FIT,
     // autoCenter: Phaser.DOM,
   },
-  scene: [Preloader, GameScene],
+  scene: [Preloader, Loading, GameScene],
 };
 
 new Phaser.Game(config);

@@ -20,7 +20,17 @@ class Preloader extends Phaser.Scene {
   constructor() {
     super(SceneKeys.preloader);
   }
+  init() {
+    this.scene.run(SceneKeys.loading);
+  }
   preload() {
+    this.load.scenePlugin(
+      "rexuiplugin",
+      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js",
+      "rexUI",
+      "rexUI"
+    );
+
     this.load.spritesheet(sokoban, "./assets/tilesheet.png", {
       frameWidth: 64,
       frameHeight: 64,
@@ -32,48 +42,13 @@ class Preloader extends Phaser.Scene {
     });
   }
   create() {
-    this.generatePlayerAnimation("idle", [
-      { key: DOWN_IDLE, frame: 52 },
-      { key: UP_IDLE, frame: 55 },
-      { key: RIGHT_IDLE, frame: 78 },
-      { key: LEFT_IDLE, frame: 81 },
-    ]);
-    this.generatePlayerAnimation("walk", [
-      { key: DOWN_WALK, start: 52, end: 54 },
-      { key: UP_WALK, start: 55, end: 57 },
-      { key: RIGHT_WALK, start: 78, end: 80 },
-      { key: LEFT_WALK, start: 81, end: 83 },
-    ]);
-    this.scene.start(SceneKeys.game);
+    /* Starting the game scene. */
+    this.time.delayedCall(2000, () => {
+      this.scene.stop(SceneKeys.loading);
+      this.scene.start(SceneKeys.game);
+    });
   }
   update() {}
-  generatePlayerAnimation = <T extends "idle" | "walk">(
-    x: T,
-    y: T extends "idle" ? StaticData[] : DynamicData[]
-  ) => {
-    switch (x) {
-      case "idle":
-        (y as StaticData[]).forEach(({ frame, key }) => {
-          this.anims.create({
-            key,
-            frames: [{ key: sokoban, frame }],
-          });
-        });
-        break;
-      case "walk":
-        (y as DynamicData[]).forEach(({ key, ...arr }) => {
-          this.anims.create({
-            key,
-            frames: this.anims.generateFrameNumbers(sokoban, {
-              ...arr,
-            }),
-            frameRate: 10,
-            repeat: -1,
-          });
-        });
-        break;
-    }
-  };
 }
 
 export default Preloader;
