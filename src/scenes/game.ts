@@ -35,7 +35,7 @@ class GameScene extends Phaser.Scene {
   }
 
   create() {
-    const modal = new Modal(this);
+    // const modal = new Modal(this);
     const { width } = this.scale;
     this.boxGroup = this.physics.add.staticGroup();
     const timerLabel = this.add
