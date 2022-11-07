@@ -10,13 +10,6 @@ class Preloader extends Phaser.Scene {
     this.scene.run(SceneKeys.loading);
   }
   preload() {
-    this.load.scenePlugin(
-      "rexuiplugin",
-      "https://raw.githubusercontent.com/rexrainbow/phaser3-rex-notes/master/dist/rexuiplugin.min.js",
-      "rexUI",
-      "rexUI"
-    );
-
     this.load.spritesheet(sokoban, "./assets/tilesheet.png", {
       frameWidth: 64,
       frameHeight: 64,
@@ -29,10 +22,8 @@ class Preloader extends Phaser.Scene {
   }
   create() {
     /* Starting the game scene. */
-    this.time.delayedCall(2000, () => {
-      this.scene.stop(SceneKeys.loading);
-      this.scene.start(SceneKeys.game);
-    });
+    this.scene.stop(SceneKeys.loading);
+    this.scene.start(SceneKeys.game);
   }
   update() {}
 }

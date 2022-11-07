@@ -46,7 +46,7 @@ class GameScene extends Phaser.Scene {
       this.addText("You Lost");
       this.sound.play(SoundKeys.GameOver);
     });
-    // this.createBoxes();
+    this.createBoxes();
   }
   checkMatch() {
     const [first, second] = this.selectedBoxes;
