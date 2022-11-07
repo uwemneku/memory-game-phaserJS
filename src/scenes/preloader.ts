@@ -1,20 +1,6 @@
 import { SceneKeys, soundData, SoundKeys } from "./../constants/assets";
 import Phaser from "phaser";
-import {
-  DOWN_IDLE,
-  DOWN_WALK,
-  LEFT_IDLE,
-  LEFT_WALK,
-  RIGHT_IDLE,
-  RIGHT_WALK,
-  UP_IDLE,
-  UP_WALK,
-} from "../constants/animation";
 import { images, sokoban } from "../constants/assets";
-type StaticData = { key: string; frame: number };
-type DynamicData = {
-  key: string;
-} & Phaser.Types.Animations.GenerateFrameNumbers;
 
 class Preloader extends Phaser.Scene {
   constructor() {
