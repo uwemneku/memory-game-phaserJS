@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import Buttons from "phaser3-rex-plugins/templates/ui/buttons/Buttons";
 // import { Buttons } from "phaser3-rex-plugins/templates/ui/ui-components";
 export default class Modal {
   group: Phaser.GameObjects.Group;
@@ -12,18 +13,29 @@ export default class Modal {
     graphics.fillStyle(0xffffff, 1);
     graphics
       .fillRoundedRect(width / 2 - 150, height / 2 - 100, 300, 200, 15)
-      .setInteractive()
+      .setInteractive({})
       .on("pointerdown", () => {
-        console.log("hello");
-
-        this.hide();
+        console.log("yoo");
       });
-    // const text = scene.add
-    //   .text(width / 2, height / 2, "Press A to Start", { color: "#000000" })
-    //   .setOrigin(0.5);
 
-    this.group.setDepth(50000);
+    const text = scene.add
+      .text(width / 2, height / 2, "Press A to Start", { color: "#000000" })
+      .setOrigin(0.5);
+
+    this.group.addMultiple([graphics, text]);
+    this.group.setDepth(500000000);
     console.log(this.group);
+    var buttons = new Buttons(scene, {
+      orientation: 0,
+      buttons: [text],
+      click: {
+        mode: "pointerdown",
+      },
+      setValueCallback(button, value, previousValue) {
+        console.log("dddd");
+      },
+    });
+    scene.add.existing(buttons);
   }
   hide() {
     this.group.children.iterate((i) => {

@@ -14,6 +14,11 @@ class Preloader extends Phaser.Scene {
       frameWidth: 64,
       frameHeight: 64,
     });
+    this.load.atlasXML(
+      "button",
+      "./assets/greenSheet.png",
+      "./assets/greenSheet.xml"
+    );
     images.forEach((i) => this.load.image(i.name, `./assets/${i.img}`));
     this.load.audio(SoundKeys.Music, "./assets/music/8Bit-Mini-Gamer-Loop.wav");
     soundData.forEach(({ fileName, key }) => {

@@ -1,5 +1,5 @@
 import { tweenMusic } from "./MusicUtils";
-import { SceneKeys, SoundKeys } from "./../constants/assets";
+import { button, SceneKeys, SoundKeys } from "./../constants/assets";
 import Phaser from "phaser";
 import Box from "./box";
 import Modal from "./Modal";
@@ -21,6 +21,7 @@ class GameScene extends Phaser.Scene {
   matchCount = 0;
   startKey!: Phaser.Input.Keyboard.Key;
   timer!: CountdownController;
+  isGameEnabled = false;
 
   constructor() {
     super(SceneKeys.game);
@@ -28,24 +29,40 @@ class GameScene extends Phaser.Scene {
   }
   init() {
     this.cursors = this.input.keyboard.createCursorKeys();
-    this.music = this.sound.add(SoundKeys.Music, { loop: true, volume: 0 });
-    this.startKey = this.input.keyboard.addKey("A");
+  }
+  startGame() {
+    this.isGameEnabled = true;
+    this.music = this.sound.add(SoundKeys.Music, { loop: true, volume: 0.005 });
     this.music.play();
     tweenMusic(this, this.music, 0.3);
+    this.timer.start(45000, () => {
+      tweenMusic(this, this.music, 0);
+      this.music.stop();
+      this.addText("You Lost");
+      this.sound.play(SoundKeys.GameOver);
+      this.scene.restart();
+    });
   }
 
   create() {
-    // const modal = new Modal(this);
-    const { width } = this.scale;
+    const { width, height } = this.scale;
+    const btn = this.add
+      .image(width * 0.5, height * 0.5, button, "green_button01.png")
+      .setOrigin(0.5);
+
+    const startText = this.add
+      .text(btn.x, btn.y, "Start", { fontSize: "30px" })
+      .setOrigin(0.5);
+    const btnGroup = this.add.group([btn, startText]).setDepth(20000);
+    btn.setInteractive().on("pointerdown", () => {
+      this.startGame();
+      btnGroup.destroy(true);
+    });
     this.boxGroup = this.physics.add.staticGroup();
     const timerLabel = this.add
       .text(width * 0.5, 50, "Timer", { fontSize: "32px" })
       .setOrigin(0.5);
-    this.timer = new CountdownController(this, timerLabel).start(45000, () => {
-      tweenMusic(this, this.music, 0);
-      this.addText("You Lost");
-      this.sound.play(SoundKeys.GameOver);
-    });
+    this.timer = new CountdownController(this, timerLabel);
     this.createBoxes();
   }
   checkMatch() {
@@ -72,8 +89,12 @@ class GameScene extends Phaser.Scene {
     if (this.matchCount === 4) {
       tweenMusic(this, this.music, 0);
       this.timer.stop();
+      this.music.stop();
       this.sound.play(SoundKeys.Victory);
       this.addText("You Won");
+      this.time.delayedCall(1000, () => {
+        this.scene.restart();
+      });
     }
   }
 
@@ -95,7 +116,7 @@ class GameScene extends Phaser.Scene {
           index
         );
         _box.setInteractive().on("pointerdown", () => {
-          if (this.selectedBoxes.length === 2) return;
+          if (this.selectedBoxes.length === 2 || !this.isGameEnabled) return;
           this.selectedBoxes.push(_box);
           _box.open(() => {
             if (this.selectedBoxes.length === 2) {

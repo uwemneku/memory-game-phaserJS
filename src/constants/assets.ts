@@ -5,6 +5,7 @@ enum Assets {
   duck = "duck",
   parrot = "parrot",
   penguin = "penguin",
+  button = "button",
 }
 export enum SceneKeys {
   preloader = "preloader",
@@ -34,4 +35,4 @@ export const images: { img: string; name: string }[] = [
   { img: "penguin.png", name: Assets.penguin },
 ];
 export const imageKeys = images.map((i) => i.name);
-export const { sokoban, bear, chicken, duck, parrot, penguin } = Assets;
+export const { sokoban, bear, chicken, duck, parrot, penguin, button } = Assets;
