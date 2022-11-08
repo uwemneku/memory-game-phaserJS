@@ -31,9 +31,6 @@ export default class Modal {
       click: {
         mode: "pointerdown",
       },
-      setValueCallback(button, value, previousValue) {
-        console.log("dddd");
-      },
     });
     scene.add.existing(buttons);
   }
